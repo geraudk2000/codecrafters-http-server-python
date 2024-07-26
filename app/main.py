@@ -1,4 +1,15 @@
 import socket
+import re
+
+OK_RESPONSE = "HTTP/1.1 200 OK\r\n\r\n".encode()
+NOTFOUND_RESPONSE = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
+
+def parse_request(resquest_data): 
+
+    lines = resquest_data.split('\r\n')
+    start_line = lines[0]
+    method, path, version = start_line.split(" ")
+    return method, path, version
 
 
 def main():
@@ -6,29 +17,26 @@ def main():
     print("Logs from your program will appear here!")
 
     #
-    OK_RESPONSE = "HTTP/1.1 200 OK\r\n\r\n".encode()
-    NOTFOUND_RESPONSE = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
-    server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
-    #server_socket.accept()[0].sendall(b"HTTP/1.1 200 OK\r\n\r\n") # wait for client
 
-    client_socket, addr = server_socket.accept()
+    server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
+    client_socket, client_addr = server_socket.accept()
+    
     with client_socket:
-        while True: 
-            data = client_socket.recv(1024)
-            request_data = data.decode().split("\r\n")
-            print(request_data)
-            url_path = request_data[0].split(" ")[1]
-            print(url_path)
-            if url_path == "/":
-                client_socket.sendall(OK_RESPONSE)
-            elif url_path.startswith("/echo/"):
-                string = url_path.strip("/echo/")
-                print(string)
-                #response =  f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
-                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)-1}\r\n\r\n{string}".encode()
-                client_socket.sendall(response)
-            else:
-                client_socket.sendall(NOTFOUND_RESPONSE)
+        
+        data = client_socket.recv(1024)
+        method, path, version = parse_request(data.decode())
+        print(path)
+        if path == "/": 
+            client_socket.sendall(OK_RESPONSE)
+        elif path.startswith("/echo/"):
+            string = path.lstrip("/echo/")
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
+        
+            print(response)
+            client_socket.sendall(response)
+                
+        else:
+            client_socket.sendall(NOTFOUND_RESPONSE)
             
             
 if __name__ == "__main__":
