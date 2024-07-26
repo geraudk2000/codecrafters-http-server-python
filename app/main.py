@@ -25,7 +25,7 @@ def main():
                 string = url_path.strip("/echo/")
                 print(string)
                 #response =  f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
-                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)-1}\r\n\r\n{string}".encode()
                 client_socket.sendall(response)
             else:
                 client_socket.sendall(NOTFOUND_RESPONSE)
