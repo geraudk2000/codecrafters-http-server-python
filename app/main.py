@@ -1,6 +1,6 @@
 import socket
 import threading
-import argparse
+import sys
 import os
 
 OK_RESPONSE = "HTTP/1.1 200 OK\r\n\r\n".encode()
@@ -14,7 +14,7 @@ def parse_request(resquest_data):
     return method, path, version
 
 
-def handle_request(client_socket, client_address, directory):
+def handle_request(client_socket, client_address):
     
     with client_socket: 
         data = client_socket.recv(1024)
@@ -38,14 +38,14 @@ def handle_request(client_socket, client_address, directory):
             #client_socket.sendall(response)    
         elif path.startswith("/files/"):
             file_name = path.split("/")[-1]
-            #print(file_name)
+            directory = sys.argv[2]
             file_path = os.path.join(directory, file_name)
             #print(file_path)
             try:         
                 with open(file_path, "r", encoding='utf-8') as file: 
-                    string = file.read()
-                    response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
-            except FileNotFoundError:
+                    content = file.read()
+                    response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(content)}\r\n\r\n{content}".encode()
+            except Exception as e:
                 response = NOTFOUND_RESPONSE
 
         else:
@@ -60,16 +60,12 @@ def main():
     print("Logs from your program will appear here!")
 
     #
-    parser = argparse.ArgumentParser(description="folder for HTTP Server")
-    parser.add_argument("--directory")
-    arguments = parser.parse_args()
-    folder = arguments.directory
-    print("this is folder ->" + folder)
+    
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
 
     while True:    
         client_socket, client_addr = server_socket.accept()
-        threading.Thread(target=handle_request, args = (client_socket, client_addr, folder)).start()
+        threading.Thread(target=handle_request, args = (client_socket, client_addr)).start()
 
     
     
