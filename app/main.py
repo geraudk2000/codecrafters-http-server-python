@@ -44,7 +44,7 @@ def handle_request(client_socket, client_address, directory):
             try:         
                 with open(file_path, "r", encoding='utf-8') as file: 
                     string = file.read()
-                    response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
+                    response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
             except FileNotFoundError:
                 response = NOTFOUND_RESPONSE
 
