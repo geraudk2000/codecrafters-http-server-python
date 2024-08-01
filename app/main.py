@@ -32,8 +32,9 @@ def handle_request(client_socket, client_address):
             response = OK_RESPONSE
             #client_socket.sendall(response)
         elif path.startswith("/echo/"):
-            #string = path.lstrip("/echo/")
-            string = data.decode().split(":")[-1].lstrip(" ").rstrip("\r\n\r\n")
+            string = path.lstrip("/echo/")
+            print(string)
+            #string = data.decode().split(":")[-1].lstrip(" ").rstrip("\r\n\r\n")
             if not encoding:
                 encode_string = ""
             else:
