@@ -38,11 +38,11 @@ def handle_request(client_socket, client_address):
             if not encoding:
                 encode_string = ""
                 compress_body = ""
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
             else:
                 encode_string = encoding.group(0)
-                compress_body = gzip.compress(string.encode())
-            
-            response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {encode_string}\r\nContent-Length: {len(compress_body)}\r\n\r\n".encode() + compress_body
+                compress_body = gzip.compress(string.encode())    
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {encode_string}\r\nContent-Length: {len(compress_body)}\r\n\r\n".encode() + compress_body
             #print(response)
             #client_socket.sendall(response)
         elif path.startswith("/user-agent"):
