@@ -39,7 +39,7 @@ def handle_request(client_socket, client_address):
                 compress_body = gzip.compress(encode_string.encode())
             string = path.lstrip("/echo/")
             response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {encode_string}\r\nContent-Length: {len(string)}\r\n\r\n".encode() + compress_body
-            print(response)
+            #print(response)
             #client_socket.sendall(response)
         elif path.startswith("/user-agent"):
             string = data.decode().split(":")[-1].lstrip(" ").rstrip("\r\n\r\n")
