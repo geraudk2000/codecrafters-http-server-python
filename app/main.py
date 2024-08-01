@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 import os
+import re
 
 OK_RESPONSE = "HTTP/1.1 200 OK\r\n\r\n".encode()
 NOTFOUND_RESPONSE = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
@@ -22,15 +23,21 @@ def handle_request(client_socket, client_address):
         print(data)
         method, path, version = parse_request(data.decode())
         #print(method, path, version) 
-        #print(path)
+        encoding = re.search("Accept-Encoding: gzip", data.decode())
+        print(path)
         data_post = data.decode().split('\n')[-1]
-        print(data_post)
+        #print(data_post)
         if path == "/": 
             response = OK_RESPONSE
             #client_socket.sendall(response)
         elif path.startswith("/echo/"):
+            if not encoding:
+                encode_string = "Accept-Encoding: invalid-encoding"
+            else:
+                encode_string = encoding.group(0)
+
             string = path.lstrip("/echo/")
-            response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n{encode_string}\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
             #client_socket.sendall(response)
         elif path.startswith("/user-agent"):
             string = data.decode().split(":")[-1].lstrip(" ").rstrip("\r\n\r\n")
