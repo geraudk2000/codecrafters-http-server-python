@@ -23,7 +23,7 @@ def handle_request(client_socket, client_address):
         print(data)
         method, path, version = parse_request(data.decode())
         #print(method, path, version) 
-        encoding = re.search("Accept-Encoding: gzip", data.decode())
+        encoding = re.search("gzip", data.decode())
         print(path)
         data_post = data.decode().split('\n')[-1]
         #print(data_post)
@@ -32,7 +32,7 @@ def handle_request(client_socket, client_address):
             #client_socket.sendall(response)
         elif path.startswith("/echo/"):
             if not encoding:
-                encode_string = "Accept-Encoding: invalid-encoding"
+                encode_string = ""
             else:
                 encode_string = encoding.group(0)
 
