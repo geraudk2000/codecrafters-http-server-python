@@ -37,6 +37,7 @@ def handle_request(client_socket, client_address):
             #string = data.decode().split(":")[-1].lstrip(" ").rstrip("\r\n\r\n")
             if not encoding:
                 encode_string = ""
+                compress_body = ""
             else:
                 encode_string = encoding.group(0)
                 compress_body = gzip.compress(string.encode())
