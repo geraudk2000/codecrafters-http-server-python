@@ -37,7 +37,7 @@ def handle_request(client_socket, client_address):
                 encode_string = encoding.group(0)
 
             string = path.lstrip("/echo/")
-            response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n{encode_string}\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {encode_string}\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
             #client_socket.sendall(response)
         elif path.startswith("/user-agent"):
             string = data.decode().split(":")[-1].lstrip(" ").rstrip("\r\n\r\n")
