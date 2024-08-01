@@ -19,10 +19,12 @@ def handle_request(client_socket, client_address):
     with client_socket: 
         data = client_socket.recv(1024)
         response = NOTFOUND_RESPONSE
-        #print(data)
+        print(data)
         method, path, version = parse_request(data.decode())
         #print(method, path, version) 
-        print(path)
+        #print(path)
+        data_post = data.decode().split('\n')[-1]
+        print(data_post)
         if path == "/": 
             response = OK_RESPONSE
             #client_socket.sendall(response)
@@ -36,23 +38,36 @@ def handle_request(client_socket, client_address):
             response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(string)}\r\n\r\n{string}".encode()
             #print(response)
             #client_socket.sendall(response)    
-        elif path.startswith("/files/"):
+        elif path.startswith("/files/") and method == "GET":
             file_name = path.split("/")[-1]
             directory = sys.argv[2]
             file_path = os.path.join(directory, file_name)
-            #print(file_path)
+            print(file_path)
             try:         
                 with open(file_path, "r", encoding='utf-8') as file: 
                     content = file.read()
                     response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(content)}\r\n\r\n{content}".encode()
             except Exception as e:
                 response = NOTFOUND_RESPONSE
+        elif path.startswith("/files/") and method == "POST":
+            print("method is post")
+            if path.startswith("/files"): 
+                file_name = path.split("/")[-1]
+                directory = sys.argv[2]
+                file_path = os.path.join(directory, file_name)
+                try:
+                    with open(file_path, "w", encoding="utf-8") as file:
+                        file.write(data_post)
+                    response = f"HTTP/1.1 201 Created\r\n\r\n".encode()
+                except Exception as e:
+                    response = f"file cannot be created".encode()          
 
         else:
             response = NOTFOUND_RESPONSE
             #client_socket.sendall(NOTFOUND_RESPONSE)
         client_socket.sendall(response)
-    
+
+        
 
 
 def main():
@@ -67,8 +82,6 @@ def main():
         client_socket, client_addr = server_socket.accept()
         threading.Thread(target=handle_request, args = (client_socket, client_addr)).start()
 
-    
-    
-            
+                
 if __name__ == "__main__":
     main()
