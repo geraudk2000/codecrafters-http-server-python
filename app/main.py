@@ -21,7 +21,7 @@ def handle_request(client_socket, client_address):
     with client_socket: 
         data = client_socket.recv(1024)
         response = NOTFOUND_RESPONSE
-        print(data)
+        #print(data)
         method, path, version = parse_request(data.decode())
         #print(method, path, version) 
         encoding = re.search("gzip", data.decode())
@@ -32,9 +32,9 @@ def handle_request(client_socket, client_address):
             response = OK_RESPONSE
             #client_socket.sendall(response)
         elif path.startswith("/echo/"):
-            string = path.lstrip("/echo/")
-            print(string)
+            string = path.split("/")[-1]
             #string = data.decode().split(":")[-1].lstrip(" ").rstrip("\r\n\r\n")
+            print(string)
             if not encoding:
                 encode_string = ""
                 compress_body = ""
